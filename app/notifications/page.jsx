@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+// Import useSession but don't destructure it directly at the top level
 import { useSession } from "next-auth/react";
 import AuthCheck from "@/components/AuthCheck";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -34,7 +35,8 @@ const genAI = new GoogleGenerativeAI(
 );
 
 export default function NotificationsPage() {
-  const { data: session } = useSession();
+  // Don't destructure session at the component level - move it inside useEffect
+  const session = useSession();
   const router = useRouter();
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
@@ -67,20 +69,16 @@ export default function NotificationsPage() {
 
   // Apply filters to notifications (improved function)
   const applyFilters = (notifs, category, date, search) => {
-    // Check if we have notifications to filter
     if (!notifs || notifs.length === 0) {
       return [];
     }
     
     let filtered = [...notifs];
     
-    // Filter by category - make sure we handle "all" correctly
     if (category !== "all") {
       filtered = filtered.filter(n => n.category === category);
     }
-    // For "all" category, we keep all notifications (no filtering)
     
-    // Filter by date
     if (date !== "all") {
       const now = new Date();
       
@@ -95,7 +93,6 @@ export default function NotificationsPage() {
       }
     }
     
-    // Filter by search query
     if (search && search.trim() !== "") {
       const query = search.toLowerCase();
       filtered = filtered.filter(n => 
@@ -115,21 +112,18 @@ export default function NotificationsPage() {
         const savedNotifications = localStorage.getItem('notifications');
         
         if (savedNotifications) {
-          // Parse the notifications
           const parsedNotifications = JSON.parse(savedNotifications);
           console.log("Loaded notifications:", parsedNotifications.length);
           
-          // Set both state variables in a synchronized way
           setNotifications(parsedNotifications);
           
-          // Apply filters synchronously here
           const filtered = applyFilters(parsedNotifications, activeFilter, dateFilter, searchQuery);
           console.log("Initial filtering returned", filtered.length, "items for", activeFilter, "category");
           
           setFilteredNotifications(filtered);
         } else {
           console.log("No saved notifications found, generating new ones");
-          await generateNotifications(); // Wait for this to complete
+          await generateNotifications();
         }
       } catch (e) {
         console.error("Error loading notifications:", e);
@@ -142,14 +136,11 @@ export default function NotificationsPage() {
     };
     
     loadNotificationsData();
-  }, []); // Only run on component mount
+  }, []);
 
-  // Always make sure filtered notifications reflect the active filter
-  // This is a safety mechanism
   useEffect(() => {
-    if (!initComplete) return; // Skip until initialization is complete
+    if (!initComplete) return;
     
-    // Only run this if we have notifications
     if (notifications.length > 0) {
       console.log("Safety filtering - ensuring filtered list reflects current filters");
       const filtered = applyFilters(notifications, activeFilter, dateFilter, searchQuery);
@@ -157,22 +148,18 @@ export default function NotificationsPage() {
       if (filtered.length > 0 || activeFilter !== 'all') {
         setFilteredNotifications(filtered);
       } else if (activeFilter === 'all' && filtered.length === 0) {
-        // For 'all' category, if we still have no results but should have, show everything
         console.warn("Forcing display of all notifications as fallback");
         setFilteredNotifications([...notifications]);
       }
     }
   }, [notifications, activeFilter, dateFilter, searchQuery, initComplete]);
 
-  // Generate notifications using Gemini API - improved async version
   const generateNotifications = async () => {
     setIsGenerating(true);
     try {
-      // Get user's saved foods from localStorage
       const savedFoods = JSON.parse(localStorage.getItem('savedFoods') || '[]');
       const recentFoods = savedFoods.slice(0, 5).map(item => item.food.food_name);
       
-      // Create a prompt for Gemini
       const prompt = `
         Generate 8-10 realistic and diverse nutrition notifications for a user who recently logged these foods:
         ${recentFoods.length ? recentFoods.join(', ') : 'No recent food logs'}
@@ -202,36 +189,29 @@ export default function NotificationsPage() {
         Make the notifications encouraging, specific, and diverse in content.
       `;
       
-      // Call Gemini API
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
-      // Clean the text to ensure valid JSON
       const cleanedText = text.replace(/```json|```/g, "").trim();
       
       try {
-        // Parse the response
         const generatedNotifications = JSON.parse(cleanedText);
         
-        // Add IDs to notifications
         const notificationsWithIds = generatedNotifications.map((notification, index) => ({
           ...notification,
           id: Date.now() + index
         }));
         
-        // Important: Update state in a synchronized way
         setNotifications(notificationsWithIds);
         
-        // Apply filters immediately to the newly generated notifications
         const filtered = applyFilters(notificationsWithIds, activeFilter, dateFilter, searchQuery);
         console.log("Generated", notificationsWithIds.length, "notifications, filtered to", filtered.length);
         
         if (filtered.length > 0 || activeFilter !== 'all') {
           setFilteredNotifications(filtered);
         } else {
-          // If "all" category should show everything
           setFilteredNotifications(notificationsWithIds);
         }
         
@@ -243,8 +223,7 @@ export default function NotificationsPage() {
       }
     } catch (error) {
       console.error("Error generating notifications:", error);
-      // Fallback notifications
-      const currentDate = new Date(); // Current date for recent timestamps
+      const currentDate = new Date();
       const fallbackNotifications = [
         {
           id: Date.now(),
@@ -253,7 +232,7 @@ export default function NotificationsPage() {
           priority: "medium", 
           icon: "💧",
           read: false,
-          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 60 * 2).toISOString() // 2 hours ago
+          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 60 * 2).toISOString()
         },
         {
           id: Date.now() + 1,
@@ -262,7 +241,7 @@ export default function NotificationsPage() {
           priority: "low",
           icon: "💪",
           read: true,
-          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 60 * 24).toISOString() // 1 day ago
+          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 60 * 24).toISOString()
         },
         {
           id: Date.now() + 2,
@@ -271,7 +250,7 @@ export default function NotificationsPage() {
           priority: "high",
           icon: "🏆",
           read: false,
-          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 30).toISOString() // 30 minutes ago
+          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 30).toISOString()
         },
         {
           id: Date.now() + 3,
@@ -280,7 +259,7 @@ export default function NotificationsPage() {
           priority: "medium",
           icon: "📊",
           read: false,
-          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 60 * 5).toISOString() // 5 hours ago
+          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 60 * 5).toISOString()
         },
         {
           id: Date.now() + 4,
@@ -289,11 +268,10 @@ export default function NotificationsPage() {
           priority: "medium",
           icon: "🥦",
           read: false,
-          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 15).toISOString() // 15 minutes ago
+          timestamp: new Date(currentDate.getTime() - 1000 * 60 * 15).toISOString()
         }
       ];
       
-      // Apply filters to fallback notifications too
       setNotifications(fallbackNotifications);
       
       const filtered = applyFilters(fallbackNotifications, activeFilter, dateFilter, searchQuery);
@@ -301,7 +279,6 @@ export default function NotificationsPage() {
       if (filtered.length > 0 || activeFilter !== 'all') {
         setFilteredNotifications(filtered);
       } else {
-        // For "all" category, always show all notifications
         setFilteredNotifications(fallbackNotifications);
       }
       
@@ -312,7 +289,6 @@ export default function NotificationsPage() {
     }
   };
 
-  // Mark notification as read
   const markAsRead = (id) => {
     const updatedNotifications = notifications.map(notification => 
       notification.id === id ? { ...notification, read: true } : notification
@@ -322,7 +298,6 @@ export default function NotificationsPage() {
     localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
   };
 
-  // Mark all notifications as read
   const markAllAsRead = () => {
     const updatedNotifications = notifications.map(notification => ({ 
       ...notification, 
@@ -333,7 +308,6 @@ export default function NotificationsPage() {
     localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
   };
 
-  // Delete a notification
   const deleteNotification = (id) => {
     const updatedNotifications = notifications.filter(notification => notification.id !== id);
     setNotifications(updatedNotifications);
@@ -341,14 +315,12 @@ export default function NotificationsPage() {
     localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
   };
 
-  // Clear all notifications
   const clearAllNotifications = () => {
     setNotifications([]);
     setFilteredNotifications([]);
     localStorage.setItem('notifications', JSON.stringify([]));
   };
   
-  // Get priority color
   function getPriorityColor(priority) {
     switch(priority?.toLowerCase()) {
       case 'high': return 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -358,7 +330,6 @@ export default function NotificationsPage() {
     }
   }
 
-  // Get category badge style
   function getCategoryBadge(category) {
     switch(category?.toLowerCase()) {
       case 'tip': return 'bg-blue-600/20 text-blue-400 border-blue-600/30';
@@ -370,7 +341,6 @@ export default function NotificationsPage() {
     }
   }
 
-  // Get category icon
   function getCategoryIcon(category) {
     switch(category?.toLowerCase()) {
       case 'tip': return <Info className="h-4 w-4" />;
@@ -382,7 +352,6 @@ export default function NotificationsPage() {
     }
   }
 
-  // Format time ago from date
   function formatTimeAgo(timestamp) {
     try {
       const date = new Date(timestamp);
@@ -413,11 +382,9 @@ export default function NotificationsPage() {
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
         
-        {/* Animated glowing orb */}
         <div className="fixed top-1/4 -right-28 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
         <div className="fixed top-3/4 -left-28 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
         
-        {/* Header */}
         <header className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-black/80 via-black/70 to-black/80 border-b border-slate-800/60 shadow-lg">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-16">
@@ -435,7 +402,6 @@ export default function NotificationsPage() {
               </div>
               
               <div className="flex items-center space-x-2">
-                {/* Search button (mobile) */}
                 <button 
                   onClick={() => setIsSearchOpen(!isSearchOpen)}
                   className="md:hidden p-2 rounded-full hover:bg-slate-800/60"
@@ -447,7 +413,6 @@ export default function NotificationsPage() {
                   )}
                 </button>
                 
-                {/* Search input (desktop) */}
                 <div className="hidden md:flex bg-slate-900/50 border border-slate-700/50 rounded-full px-3 py-1.5">
                   <Search className="w-4 h-4 text-slate-400 mr-2" />
                   <input
@@ -467,7 +432,6 @@ export default function NotificationsPage() {
                   )}
                 </div>
                 
-                {/* Filter button */}
                 <div className="relative">
                   <button 
                     onClick={() => setShowFilterMenu(!showFilterMenu)}
@@ -476,7 +440,6 @@ export default function NotificationsPage() {
                     <Filter className="w-5 h-5" />
                   </button>
                   
-                  {/* Filter dropdown */}
                   {showFilterMenu && (
                     <motion.div 
                       initial={{ opacity: 0, y: 10 }}
@@ -492,13 +455,12 @@ export default function NotificationsPage() {
                           onClick={() => {
                             setActiveFilter(filter);
                             
-                            // Force immediate refiltering
                             const currentNotifs = [...notifications];
                             const filtered = applyFilters(currentNotifs, filter, dateFilter, searchQuery);
                             console.log(`Switching to ${filter} - found ${filtered.length} matching items`);
                             setFilteredNotifications(filtered.length > 0 || filter !== 'all' 
                               ? filtered 
-                              : currentNotifs); // Fallback for "all" category
+                              : currentNotifs);
                               
                             setShowFilterMenu(false);
                           }}
@@ -527,7 +489,6 @@ export default function NotificationsPage() {
                             onClick={() => {
                               setDateFilter(dateOpt.id);
                               
-                              // Force immediate refiltering for date as well
                               const currentNotifs = [...notifications];
                               const filtered = applyFilters(currentNotifs, activeFilter, dateOpt.id, searchQuery);
                               setFilteredNotifications(filtered);
@@ -547,7 +508,6 @@ export default function NotificationsPage() {
                   )}
                 </div>
                 
-                {/* Refresh button */}
                 <button 
                   onClick={generateNotifications} 
                   disabled={isGenerating}
@@ -556,7 +516,6 @@ export default function NotificationsPage() {
                   <RefreshCw className="w-5 h-5" />
                 </button>
                 
-                {/* Settings button */}
                 <button className="p-2 rounded-full hover:bg-slate-800/60">
                   <Settings className="w-5 h-5" />
                 </button>
@@ -564,7 +523,6 @@ export default function NotificationsPage() {
             </div>
           </div>
           
-          {/* Mobile search bar */}
           {isSearchOpen && (
             <motion.div 
               initial={{ height: 0, opacity: 0 }}
@@ -596,7 +554,6 @@ export default function NotificationsPage() {
         </header>
         
         <div className="container mx-auto px-4 pt-6 pb-24">
-          {/* Stats bar */}
           <div className="bg-gradient-to-br from-slate-900/80 to-black/60 backdrop-blur-lg border border-slate-700/50 rounded-xl p-4 mb-6 shadow-xl">
             <div className="flex justify-between items-center">
               <div className="text-sm md:text-base">
@@ -641,7 +598,6 @@ export default function NotificationsPage() {
             </div>
           </div>
           
-          {/* Category tabs (desktop) */}
           <div className="hidden md:flex mb-6 gap-2 overflow-x-auto pb-1 no-scrollbar">
             {['all', 'tip', 'reminder', 'achievement', 'insight', 'challenge'].map(category => (
               <motion.button
@@ -649,10 +605,8 @@ export default function NotificationsPage() {
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  // Update filter state
                   setActiveFilter(category);
                   
-                  // Force immediate re-filtering with notifications from state
                   const currentNotifs = [...notifications];
                   const filtered = applyFilters(currentNotifs, category, dateFilter, searchQuery);
                   console.log(`Switching to ${category} - found ${filtered.length} matching items`);
@@ -660,8 +614,6 @@ export default function NotificationsPage() {
                   if (filtered.length > 0 || category !== 'all') {
                     setFilteredNotifications(filtered);
                   } else if (category === 'all') {
-                    // For "all" category, if filtering returns empty but we have notifications,
-                    // show everything as fallback
                     setFilteredNotifications(currentNotifs);
                   }
                 }}
@@ -676,7 +628,6 @@ export default function NotificationsPage() {
             ))}
           </div>
           
-          {/* Category chips (mobile) */}
           <div className="flex md:hidden mb-6 overflow-x-auto gap-2 pb-1 no-scrollbar">
             {['all', 'tip', 'reminder', 'achievement', 'insight', 'challenge'].map(category => (
               <motion.button
@@ -684,10 +635,8 @@ export default function NotificationsPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  // Update filter state
                   setActiveFilter(category);
                   
-                  // Force immediate re-filtering with notifications from state
                   const currentNotifs = [...notifications];
                   const filtered = applyFilters(currentNotifs, category, dateFilter, searchQuery);
                   console.log(`Mobile: Switching to ${category} - found ${filtered.length} matching items`);
@@ -695,8 +644,6 @@ export default function NotificationsPage() {
                   if (filtered.length > 0 || category !== 'all') {
                     setFilteredNotifications(filtered);
                   } else if (category === 'all') {
-                    // For "all" category, if filtering returns empty but we have notifications,
-                    // show everything as fallback
                     setFilteredNotifications(currentNotifs);
                   }
                 }}
@@ -711,18 +658,6 @@ export default function NotificationsPage() {
             ))}
           </div>
           
-          {/* Debug Info (only in development) */}
-          {/* {process.env.NODE_ENV === 'development' && (
-            <div className="mb-4 p-2 bg-slate-900/50 text-xs text-slate-400 rounded-lg">
-              <div>Active Filter: {activeFilter}</div>
-              <div>Date Filter: {dateFilter}</div>
-              <div>Total Notifications: {notifications.length}</div>
-              <div>Filtered Notifications: {filteredNotifications.length}</div>
-              <div>Search Query: "{searchQuery}"</div>
-            </div>
-          )} */}
-          
-          {/* Loading state */}
           {loading && (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="relative w-20 h-20">
@@ -738,7 +673,6 @@ export default function NotificationsPage() {
             </div>
           )}
           
-          {/* Generating state */}
           {isGenerating && !loading && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-gradient-to-br from-slate-900 to-black/90 border border-slate-700/50 rounded-xl p-6 max-w-md text-center">
@@ -752,7 +686,6 @@ export default function NotificationsPage() {
             </div>
           )}
           
-          {/* Notifications list */}
           {!loading && (
             <>
               {filteredNotifications.length === 0 ? (
@@ -855,7 +788,6 @@ export default function NotificationsPage() {
             </>
           )}
           
-          {/* Bottom navigation bar */}
           <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-black/80 via-black/70 to-black/80 backdrop-blur-xl border-t border-slate-800/60 py-3 px-6 flex justify-around z-40 md:hidden">
             <motion.button 
               whileHover={{ y: -2 }}
@@ -898,7 +830,6 @@ export default function NotificationsPage() {
           </div>
         </div>
         
-        {/* Back to home floating button (desktop only) */}
         <motion.button
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
