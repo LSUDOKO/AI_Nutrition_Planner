@@ -46,6 +46,20 @@ const genAI = new GoogleGenerativeAI(
     ""
 );
 
+// Function to fetch food image from the API
+const getFoodImage = async (foodName) => {
+  try {
+    const response = await fetch(`/api/getFoodImage?food=${encodeURIComponent(foodName)}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.imageUrl;
+  } catch (error) {
+    console.error('Error fetching food image:', error);
+    return null;
+  }
+};
 
 // Loading component
 const LoadingSpinner = () => (
@@ -416,20 +430,52 @@ useEffect(() => {
     }
   };
 
-  // Function to generate food image using Gemini
-  // Replace the generateFoodImage function with this version:
+  // Function to generate food image using API
   const generateFoodImage = async (foodName, description) => {
     setFoodImageLoading(true);
 
     try {
-      // Instead of using external image APIs, we'll set a flag that we're using a styled background
-      setFoodImage("gradient-placeholder");
+      // First try to get an image from the free API
+      const imageUrl = await getFoodImage(foodName);
+      
+      if (imageUrl) {
+        // If we got a successful image, use it
+        setFoodImage(imageUrl);
+        console.log("Fetched food image successfully:", imageUrl);
+      } else {
+        // Otherwise, try the Gemini API if available
+        try {
+          const response = await fetch('/api/generateFoodImage', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              foodName, 
+              description 
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to generate image with Gemini');
+          }
+          
+          const data = await response.json();
+          setFoodImage(data.imageData); // Base64 data URL from Gemini
+          console.log("Generated food image with Gemini API");
+        } catch (geminiError) {
+          console.error("Gemini image generation failed:", geminiError);
+          // Fall back to gradient placeholder
+          setFoodImage("gradient-placeholder");
+        }
+      }
 
-      // Still store the description for possible future use
+      // Store the description for possible future use
       localStorage.setItem(
         `food-description-${encodeURIComponent(foodName)}`,
         description
       );
+      
     } catch (error) {
       console.error("Error generating food image:", error);
       setFoodImage("gradient-placeholder");
@@ -1304,6 +1350,36 @@ const togglePlay = () => {
                       <div className="absolute inset-0 flex items-center justify-center bg-slate-900/60">
                         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                       </div>
+                    ) : foodImage ? (
+                      <div className="absolute inset-0">
+                        {foodImage !== "gradient-placeholder" ? (
+                          <img 
+                            src={foodImage} 
+                            alt={recipe.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/30 to-purple-600/30 flex items-center justify-center overflow-hidden">
+                            {/* Animated background elements */}
+                            {[...Array(15)].map((_, i) => (
+                              <div
+                                key={i}
+                                className="absolute rounded-full bg-white/10"
+                                style={{
+                                  width: `${Math.random() * 12 + 5}px`,
+                                  height: `${Math.random() * 12 + 5}px`,
+                                  top: `${Math.random() * 100}%`,
+                                  left: `${Math.random() * 100}%`,
+                                  animation: `float ${
+                                    Math.random() * 15 + 10
+                                  }s linear infinite`,
+                                }}
+                              ></div>
+                            ))}
+                            <ChefHat className="h-24 w-24 text-white/30" />
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/30 to-purple-600/30 flex items-center justify-center overflow-hidden">
                         {/* Animated background elements */}
@@ -1325,13 +1401,6 @@ const togglePlay = () => {
 
                         {/* Icon based on cuisine type */}
                         <ChefHat className="h-24 w-24 text-white/30" />
-
-                        {/* Recipe name overlay */}
-                        <div className="absolute bottom-4 left-4 right-4 text-center bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/10">
-                          <h3 className="text-xl font-medium text-white">
-                            {recipe.name}
-                          </h3>
-                        </div>
                       </div>
                     )}
 
@@ -1525,7 +1594,7 @@ const togglePlay = () => {
                           >
                             <path
                               fillRule="evenodd"
-                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a 1 1 0 010 1.414l-4 4a 1 1 0 01-1.414 0z"
                               clipRule="evenodd"
                             />
                           </svg>
@@ -1579,7 +1648,7 @@ const togglePlay = () => {
                           >
                             <path
                               fillRule="evenodd"
-                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a 1 1 0 010 1.414l-4 4a 1 1 0 01-1.414 0z"
                               clipRule="evenodd"
                             />
                           </svg>
@@ -1812,7 +1881,7 @@ const togglePlay = () => {
                           >
                             <path
                               fillRule="evenodd"
-                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a 1 1 0 01-1.414 0z"
                               clipRule="evenodd"
                             />
                           </svg>

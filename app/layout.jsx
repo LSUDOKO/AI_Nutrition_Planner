@@ -5,6 +5,7 @@ import { Providers } from './providers';
 import Navigation from '@/components/Navigation';
 import CustomCursor from '@/components/CustomCursor';
 import { Inter } from 'next/font/google';
+import { useEffect, useState } from 'react';
 
 // Initialize Inter font with subsets
 const inter = Inter({ 
@@ -14,26 +15,28 @@ const inter = Inter({
 });
 
 export default function RootLayout({ children }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" 
+      // No dynamic theme class at initial render to prevent hydration mismatch
+      className={`${inter.variable} h-full`}
+      // We handle dark mode with Providers component instead of directly here
+    >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>AnnaData - AI Nutrition Assistant</title>
-        {/* Script that runs before hydration for theme consistency */}
+        {/* Use a simpler script that doesn't modify classes (handles by next-themes instead) */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                try {
-                  const theme = localStorage.getItem('theme');
-                  // Only add theme class if it exists in localStorage
-                  if (theme) {
-                    document.documentElement.classList.add(theme);
-                  } else {
-                    // If no theme in storage, don't add gruvbox-dark by default
-                    // This ensures server and client match during hydration
-                  }
-                } catch (e) {}
+                // We'll let next-themes handle this instead of manual DOM manipulation
+                // This prevents the hydration mismatch
               })();
             `
           }}
