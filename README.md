@@ -1,7 +1,5 @@
 # AI Nutrition Planner: Your Personal Nutrition Intelligence Platform
 
-![AI Nutrition Planner Banner](./imagesanna/banner.png)
-
 [![Next.js](https://img.shields.io/badge/Next.js-13.4+-black)](https://nextjs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Ready-green)](https://www.mongodb.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.0+-blue)](https://tailwindcss.com/)
@@ -19,7 +17,6 @@
 
 - [Overview](#-overview)
 - [Key Features](#-key-features)
-- [Screenshots](#-screenshots)
 - [Technologies Used](#-technologies-used)
 - [Installation & Setup](#️-installation-and-setup)
 - [Environment Variables](#-environment-variables)
@@ -73,23 +70,6 @@ Built with modern web technologies and designed with user experience at its core
 - **Data Visualization**: View charts and graphs to visualize your health journey
 - **Achievement System**: Track your progress toward nutrition and fitness goals
 - **User Authentication**: Secure login and account management
-
-## 📱 Screenshots
-
-<div align="center">
-  <img src="./imagesanna/home.png" width="45%" alt="Home Dashboard">
-  <img src="./imagesanna/fitness.png" width="45%" alt="Fitness Tracking">
-</div>
-
-<div align="center">
-  <img src="./imagesanna/profile.png" width="45%" alt="User Profile">
-  <img src="./imagesanna/recipie.png" width="45%" alt="Recipe Analysis">
-</div>
-
-<div align="center">
-  <img src="./imagesanna/spring_asparagus.png" width="45%" alt="Seasonal Foods">
-  <img src="./imagesanna/spring_strawberries.png" width="45%" alt="Nutritional Insights">
-</div>
 
 ## 🚀 Technologies Used
 
@@ -231,5 +211,4 @@ This project is licensed under the MIT License.
 
 <div align="center">
   <p>Made with 💚 by the AI Nutrition Planner Team</p>
-  <p>© 2025 AI Nutrition Planner. All rights reserved.</p>
 </div>
