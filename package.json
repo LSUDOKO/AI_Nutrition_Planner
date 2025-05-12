@@ -16,6 +16,8 @@
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "framer-motion": "^12.7.4",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "lucide-react": "^0.492.0",
     "mongoose": "^8.13.2",
     "next": "15.3.1",
