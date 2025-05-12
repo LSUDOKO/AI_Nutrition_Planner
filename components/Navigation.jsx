@@ -17,7 +17,8 @@ import {
   Search,
   Settings,
   Clock,
-  LogIn
+  LogIn,
+  ShoppingCart // Added ShoppingCart icon
 } from 'lucide-react';
 
 export default function Navigation() {
@@ -117,6 +118,7 @@ export default function Navigation() {
               <NavLink href="/fitness" icon={<Dumbbell size={18} />}>Fitness</NavLink>
               <NavLink href="/recipe" icon={<ChefHat size={18} />}>Recipes</NavLink>
               <NavLink href="/diary" icon={<Calendar size={18} />}>Diary</NavLink>
+              <NavLink href="/grocery-list" icon={<ShoppingCart size={18} />}>Grocery List</NavLink> {/* Added Grocery List link */}
               <NavLink href="/profile" icon={<User size={18} />}>Profile</NavLink>
             </div>
           </div>
@@ -250,6 +252,7 @@ export default function Navigation() {
                 { href: '/fitness', label: 'Fitness', icon: <Dumbbell size={18} /> },
                 { href: '/recipe', label: 'Recipes', icon: <ChefHat size={18} /> },
                 { href: '/diary', label: 'Food Diary', icon: <Calendar size={18} /> },
+                { href: '/grocery-list', label: 'Grocery List', icon: <ShoppingCart size={18} /> }, // Added Grocery List link for mobile
                 { href: '/profile', label: 'Profile', icon: <User size={18} /> },
               ].map((item) => (
                 <NavLink key={item.href} href={item.href} icon={item.icon}>

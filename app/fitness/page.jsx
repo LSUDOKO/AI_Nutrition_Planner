@@ -4,17 +4,17 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import {
-  Activity,
+import {  Activity,
   ArrowLeft,
   Calendar,
   ChevronDown,
+  Dumbbell,
+  Heart,
+  AlertTriangle,
   ChevronUp,
   Clock,
   Edit2,
-  Heart,
   Home as HomeIcon,
-  LineChart,
   MessageCircle,
   Plus,
   RefreshCcw,
@@ -30,12 +30,10 @@ import {
   BarChart2,
   Zap,
   Target,
-  Dumbbell,
   Award,
   Droplet,
   BookOpen,
   ThumbsUp,
-  AlertTriangle,
   Info,
   CheckCircle,
   Watch,
@@ -48,7 +46,7 @@ import {
 import {
   AreaChart,
   Area,
-  LineChart as ReChartsLineChart,
+  LineChart,
   Line,
   BarChart,
   Bar,
@@ -2841,8 +2839,7 @@ export default function FitnessPage() {
                   {metrics.bodyStats.bmi.history &&
                     metrics.bodyStats.bmi.history.length > 0 && (
                       <div className="bg-gradient-to-br from-slate-900/80 to-black/60 backdrop-blur-md rounded-xl border border-slate-700/50 p-5">
-                        <h3 className="text-lg font-bold mb-4">BMI History</h3>
-                        <div className="h-64">
+                        <h3 className="text-lg font-bold mb-4">BMI History</h3>                        <div className="h-64">
                           <ResponsiveContainer width="100%" height="100%">
                             <LineChart
                               data={metrics.bodyStats.bmi.history.map(
@@ -3549,7 +3546,7 @@ export default function FitnessPage() {
                     </div>
                     <div>
                       <h3 className="font-medium text-white">
-                        Anna AI Fitness Coach
+                         AI Fitness Coach
                       </h3>
                       <p className="text-xs text-slate-400">
                         Available 24/7 for fitness advice

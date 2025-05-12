@@ -25,22 +25,10 @@ export default function RootLayout({ children }) {
     <html lang="en" 
       // No dynamic theme class at initial render to prevent hydration mismatch
       className={`${inter.variable} h-full`}
-      // We handle dark mode with Providers component instead of directly here
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>AnnaData - AI Nutrition Assistant</title>
-        {/* Use a simpler script that doesn't modify classes (handles by next-themes instead) */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                // We'll let next-themes handle this instead of manual DOM manipulation
-                // This prevents the hydration mismatch
-              })();
-            `
-          }}
-        />
+        <title>AI Nutrition Assistant</title>
       </head>
       <body className="h-full bg-slate-950">
         <Providers>

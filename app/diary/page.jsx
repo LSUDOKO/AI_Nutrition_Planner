@@ -363,7 +363,7 @@ export default function FoodDiaryPage() {
                 className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors"
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Ask Anna AI
+                Ask  AI
               </button>
             </div>
           </motion.div>

@@ -9,9 +9,8 @@ const nextConfig = {
         'bufferutil': 'commonjs bufferutil',
       });
       return config;
-    },
-    env: {
-      NEXT_PUBLIC_GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    },    env: {
+      NEXT_PUBLIC_OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     },
   };
   

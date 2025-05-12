@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         profileImage,
         createdAt: new Date(),
         // Set default values for a new user
-        bio: `Hello, I'm ${name}. Just started my nutrition and fitness journey with AnnaData!`,
+        bio: `Hello, I'm ${name}. Just started my nutrition and fitness journey with Data!`,
         theme: "primary",
         location: "",
         settings: {

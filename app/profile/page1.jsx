@@ -238,7 +238,7 @@ const ACHIEVEMENTS = [
     id: 10,
     name: "Premium Member",
     icon: <Star size={24} />,
-    description: "Subscribe to AnnaData Premium",
+    description: "Subscribe to Data Premium",
     unlockedAt: "2025-01-30",
     progress: 1,
     target: 1,
@@ -289,12 +289,12 @@ const useUserData = () => {
           // Default user data
           const defaultUser = {
             _id: "user_123456789",
-            name: "Anna Smith",
-            email: "anna@example.com",
-            username: "anna_nutrition",
+            name: "Arpit singh",
+            email: "arpit@example.com",
+            username: "arpit_nutrition",
             profileImage:
-              "https://ui-avatars.com/api/?name=Anna+Smith&background=6366f1&color=fff&size=150",
-            bio: "Nutrition enthusiast and fitness lover. Using AnnaData to track my health journey!",
+              "https://ui-avatars.com/api/?name=+Smith&background=6366f1&color=fff&size=150",
+            bio: "Nutrition enthusiast and fitness lover. Using Data to track my health journey!",
             createdAt: "2025-01-15T08:30:00Z",
             location: "New York, USA",
             theme: "primary",
@@ -3646,7 +3646,7 @@ const handleThemeChange = (themeKey) => {
                     <div>
                       <div className="flex items-center">
                         <h3 className="text-xl font-bold text-white mr-2">
-                          AnnaData {user?.subscriptionTier || "Free"}
+                          Data {user?.subscriptionTier || "Free"}
                         </h3>
                         <div
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -3865,11 +3865,11 @@ const handleThemeChange = (themeKey) => {
                   <div className="mt-6 flex justify-center">
                     <div className="text-center max-w-md">
                       <p className="text-sm text-slate-400">
-                        AnnaData Version 2.4.0 • Last Login:{" "}
+                        Data Version 2.4.0 • Last Login:{" "}
                         {formatDate(user?.lastLogin || "2025-04-19T07:30:00Z")}
                       </p>
                       <p className="text-xs text-slate-500 mt-2">
-                        © 2025 AnnaData •{" "}
+                        © 2025 Data •{" "}
                         <a
                           href="#"
                           className="text-indigo-400 hover:text-indigo-300"

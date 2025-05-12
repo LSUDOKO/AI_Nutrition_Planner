@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         userId: user._id,
         username: user.email.split('@')[0],
         profileImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff&size=150`,
-        bio: `Hello, I'm ${user.name}. Just started my nutrition and fitness journey with AnnaData!`,
+        bio: `Hello, I'm ${user.name}. Just started my nutrition and fitness journey with Data!`,
         theme: "primary",
         location: "",
         settings: {

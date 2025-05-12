@@ -870,7 +870,7 @@ const togglePlay = () => {
     }
   };
 
-  // Send message to Anna AI Cook
+  // Send message to  AI Cook
   const sendMessage = async () => {
     if (!userMessage.trim()) return;
 
@@ -884,7 +884,7 @@ const togglePlay = () => {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       // Create context for the AI
-      let context = `You are Anna AI Cook, a cooking assistant. `;
+      let context = `You are  AI Cook, a cooking assistant. `;
 
       if (recipe) {
         context += `The user is viewing a recipe for ${recipe.name}. 
@@ -979,7 +979,7 @@ const togglePlay = () => {
                 className="flex items-center px-3 py-2 rounded-md text-sm font-medium bg-indigo-700/50 hover:bg-indigo-700 transition-colors"
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Ask Anna AI Cook
+                Ask  AI Cook
               </button>
             </div>
 
@@ -1044,7 +1044,7 @@ const togglePlay = () => {
                 className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium bg-indigo-700/50 hover:bg-indigo-700 transition-colors"
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Ask Anna AI Cook
+                Ask  AI Cook
               </button>
             </div>
           </motion.div>
@@ -1887,7 +1887,7 @@ const togglePlay = () => {
                         className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:opacity-90 inline-flex items-center"
                       >
                         <MessageCircle className="mr-2 h-5 w-5" />
-                        Ask Anna AI About This Recipe
+                        Ask  AI About This Recipe
                       </button>
 
                       <button
@@ -2390,7 +2390,7 @@ const togglePlay = () => {
         </div>
       )}
 
-      {/* Anna AI Cook Chat Modal */}
+      {/*  AI Cook Chat Modal */}
       <AnimatePresence>
         {chatOpen && !chatFullscreen && (
           <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
@@ -2409,7 +2409,7 @@ const togglePlay = () => {
                       <ChefHat className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg">Anna AI Cook</h3>
+                      <h3 className="font-bold text-lg"> AI Cook</h3>
                       <p className="text-sm text-white/60">
                         Your personal cooking assistant
                       </p>
@@ -2439,7 +2439,7 @@ const togglePlay = () => {
                         <ChefHat className="h-8 w-8 text-white" />
                       </div>
                       <h3 className="text-xl font-bold mb-2">
-                        Welcome to Anna AI Cook
+                        Welcome to  AI Cook
                       </h3>
                       <p className="text-white/70 max-w-md">
                         Ask me anything about cooking, recipes, ingredients, or
@@ -2523,7 +2523,7 @@ const togglePlay = () => {
                       value={userMessage}
                       onChange={(e) => setUserMessage(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                      placeholder="Ask Anna AI Cook..."
+                      placeholder="Ask  AI Cook..."
                       className="w-full bg-slate-800/70 border border-slate-700/50 rounded-full py-3 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                       disabled={chatLoading}
                     />
@@ -2556,7 +2556,7 @@ const togglePlay = () => {
         )}
       </AnimatePresence>
 
-      {/* Anna AI Cook Fullscreen Mode */}
+      {/*  AI Cook Fullscreen Mode */}
       {chatOpen && chatFullscreen && (
         <div
           ref={chatContainerRef}
@@ -2586,7 +2586,7 @@ const togglePlay = () => {
                     </div>
                     <div>
                       <h1 className="font-bold text-xl md:text-2xl bg-gradient-to-r from-indigo-400 to-purple-500 text-transparent bg-clip-text">
-                        Anna AI Cook
+                         AI Cook
                       </h1>
                       <p className="text-sm text-white/60">
                         Your AI Cooking Assistant
@@ -2638,7 +2638,7 @@ const togglePlay = () => {
                     <ChefHat className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">
-                    Welcome to Anna AI Cook
+                    Welcome to  AI Cook
                   </h3>
                   <p className="text-white/70 max-w-lg mx-auto mb-8">
                     I'm your personal cooking assistant. Ask me anything about
@@ -2739,7 +2739,7 @@ const togglePlay = () => {
                     value={userMessage}
                     onChange={(e) => setUserMessage(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-                    placeholder="Ask Anna AI Cook anything about cooking..."
+                    placeholder="Ask  AI Cook anything about cooking..."
                     className="w-full bg-slate-800/70 border border-slate-700/50 rounded-full py-3 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50"
                     disabled={chatLoading}
                   />
@@ -2771,7 +2771,7 @@ const togglePlay = () => {
         </div>
       )}
 
-      {/* Floating Anna AI Cook Button */}
+      {/* Floating  AI Cook Button */}
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}

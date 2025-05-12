@@ -12,23 +12,76 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Food name is required' });
     }
 
-    // Initialize the Gemini API with the Pro Vision model that can generate images
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    // Handle API key validation
+    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     
-    // For image generation, we need to use a model that supports it
-    // Gemini 1.5 Pro is the model that supports image generation
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    if (!apiKey || apiKey.includes('YOUR_API_KEY')) {
+      // Fallback to using Unsplash if no valid API key is configured
+      return handleUnsplashFallback(foodName, description, res);
+    }
 
-    // Craft a prompt for food image generation
-    const prompt = `Generate a high-quality, realistic image of ${foodName}. ${description || ''}. 
-    Make it look appetizing and professional, like a food photography shot. 
-    Include appropriate garnishes and plating. Good lighting, shallow depth of field. 
-    Show the food from a top-down or slightly angled perspective.`;
+    try {
+      // Initialize the Gemini API
+      const genAI = new GoogleGenerativeAI(apiKey);
+      
+      // Use Gemini to generate a detailed food description
+      const descriptionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      
+      const detailedPrompt = `Generate a detailed visual description of ${foodName}${description ? ` (${description})` : ''}. 
+      Focus on its appearance, colors, textures, garnishes, and presentation. Make it suitable for a professional food photographer.`;
+      
+      const descriptionResult = await descriptionModel.generateContent(detailedPrompt);
+      const detailedDescription = descriptionResult.response.text();
+      
+      // Now use the detailed description to generate an image URL via Unsplash
+      return handleUnsplashFallback(foodName, detailedDescription, res);
+    } catch (error) {
+      console.error("Error with Gemini API:", error);
+      return handleUnsplashFallback(foodName, description, res);
+    }
+  } catch (error) {
+    console.error("API error:", error);
+    return res.status(500).json({ message: 'Error generating image', error: error.message });
+  }
+}
 
-    // Generate the image
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
+// Function to handle Unsplash fallback
+async function handleUnsplashFallback(foodName, description, res) {
+  try {
+    // Format the query for best results
+    const queryTerms = [
+      encodeURIComponent(foodName),
+      'food',
+      'professional',
+      'photography'
+    ];
+    
+    // Add descriptive terms if available
+    if (description) {
+      // Extract key visual terms from the description
+      const descriptionWords = description.split(' ')
+        .filter(word => word.length > 3)
+        .slice(0, 5)
+        .map(word => encodeURIComponent(word));
+      
+      queryTerms.push(...descriptionWords);
+    }
+    
+    // Create the Unsplash URL
+    const imageUrl = `https://source.unsplash.com/featured/?${queryTerms.join(',')}`;
+    
+    // Return the image URL
+    return res.status(200).json({ 
+      imageUrl,
+      source: 'unsplash',
+      foodName,
+      description: description?.substring(0, 100) || null
+    });
+  } catch (error) {
+    console.error("Unsplash fallback error:", error);
+    return res.status(500).json({ message: 'Error generating image via fallback method' });
+  }
+}
         responseMimeType: "image/jpeg",
       },
     });

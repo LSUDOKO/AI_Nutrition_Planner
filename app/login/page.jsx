@@ -295,7 +295,7 @@ export default function LoginPage() {
         
         {/* Footer text */}
         <p className="mt-4 sm:mt-6 text-xs text-slate-500">
-          © {new Date().getFullYear()} AnnaData • All rights reserved
+          © {new Date().getFullYear()} Data • All rights reserved
         </p>
       </div>
 

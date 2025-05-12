@@ -15,8 +15,9 @@ export function Providers({ children }) {
     <ThemeProvider 
       attribute="class" 
       defaultTheme="dark"
-      // Force client-side only rendering to prevent hydration mismatch
-      enableSystem={true}
+      // Prevent forcing the theme during SSR to avoid hydration mismatches
+      enableSystem={false}
+      forcedTheme={!mounted ? undefined : null}
       // Disable class/style changes during SSR
       enableColorScheme={mounted}
     >

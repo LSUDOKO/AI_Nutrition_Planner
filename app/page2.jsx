@@ -142,6 +142,7 @@ export default function HomePage() {
   const [useCamera, setUseCamera] = useState(false);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false); // New state for food analysis
   const [selectedFood, setSelectedFood] = useState(null);
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
   const [aiInsights, setAiInsights] = useState([]);
@@ -512,9 +513,9 @@ export default function HomePage() {
       const history = localStorage.getItem("searchHistory");
       if (history) {
         setSearchHistory(JSON.parse(history));
+      } catch (e) {
+        console.error("Error loading search history from localStorage:", e);
       }
-    } catch (e) {
-      console.error("Error loading search history from localStorage:", e);
     }
 
     // Load notifications from localStorage
@@ -743,6 +744,7 @@ export default function HomePage() {
 
       // If API fails, use Gemini instead
       try {
+        setAnalyzing(true); // Set analyzing state to true when using Gemini
         const foodData = await getFoodInfoFromGemini(searchTerm);
         setResults([foodData]);
       } catch (geminiError) {
@@ -750,6 +752,8 @@ export default function HomePage() {
         setError(
           "Sorry, we couldn't find information for that food. Please try another search."
         );
+      } finally {
+        setAnalyzing(false); // Make sure to set analyzing to false when done
       }
     } catch (error) {
       console.error("Error in search process:", error);
@@ -767,6 +771,7 @@ export default function HomePage() {
     }
 
     setLoading(true);
+    setAnalyzing(false); // Reset analyzing state
     setResults([]);
     setSelectedFood(null);
     setError(null);
@@ -783,6 +788,7 @@ export default function HomePage() {
 
           reader.onload = async () => {
             try {
+              setAnalyzing(true); // Set analyzing to true when analyzing image
               const base64Image = reader.result.split(",")[1];
 
               // Try with direct Gemini API
@@ -819,6 +825,7 @@ export default function HomePage() {
                 "Sorry, we couldn't identify the food in your image. Please try a text search instead."
               );
               setLoading(false);
+              setAnalyzing(false); // Make sure to reset analyzing state on error
             }
           };
 
@@ -826,6 +833,7 @@ export default function HomePage() {
             console.error("Error reading image file");
             setShowModal(true);
             setLoading(false);
+            setAnalyzing(false); // Reset analyzing state on error
           };
         } catch (fileReadError) {
           console.error("Error reading file:", fileReadError);
@@ -833,6 +841,7 @@ export default function HomePage() {
             "There was a problem processing your image. Please try again or use text search."
           );
           setLoading(false);
+          setAnalyzing(false); // Reset analyzing state on error
         }
       } else {
         // If no image, just search by text
@@ -842,6 +851,7 @@ export default function HomePage() {
       console.error("Error in search process:", error);
       setError("An unexpected error occurred. Please try again.");
       setLoading(false);
+      setAnalyzing(false); // Reset analyzing state on error
     }
   };
 
@@ -1693,6 +1703,68 @@ export default function HomePage() {
                   />
                 </svg>
                 <p>{error}</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Food Analysis Loading Indicator */}
+          {analyzing && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-6 bg-gradient-to-br from-slate-900/80 to-black/60 backdrop-blur-lg border border-indigo-500/30 rounded-xl mb-8 shadow-lg shadow-indigo-500/10"
+            >
+              <div className="flex flex-col items-center justify-center">
+                <div className="relative w-20 h-20 mb-5">
+                  <div className="w-20 h-20 rounded-full border-4 border-slate-700/50 absolute"></div>
+                  <div className="w-20 h-20 rounded-full border-4 border-t-indigo-600 border-r-purple-600 border-transparent absolute animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 animate-pulse"></div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Analyzing Your Food</h3>
+                <p className="text-slate-300 text-center mb-4">
+                  Our AI is analyzing your food to provide detailed nutritional information
+                </p>
+                
+                {/* Analysis stages */}
+                <div className="w-full max-w-md space-y-3">
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs mr-3">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium">Identifying food components</p>
+                      <div className="w-full h-1.5 bg-slate-700/50 rounded-full mt-1 overflow-hidden">
+                        <div className="h-full bg-indigo-600 animate-pulse rounded-full" style={{ width: '100%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs mr-3">
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium">Calculating nutritional values</p>
+                      <div className="w-full h-1.5 bg-slate-700/50 rounded-full mt-1 overflow-hidden">
+                        <div className="h-full bg-indigo-600 animate-pulse rounded-full" style={{ width: '70%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs mr-3">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium">Generating AI insights</p>
+                      <div className="w-full h-1.5 bg-slate-700/50 rounded-full mt-1 overflow-hidden">
+                        <div className="h-full bg-indigo-600 animate-pulse rounded-full" style={{ width: '30%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
@@ -2626,7 +2698,7 @@ export default function HomePage() {
                   className="w-full mt-4 p-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800/50 transition-colors"
                 >
                   Cancel
-                </motion.button>
+                </motion.div>
               </motion.div>
             </div>
           )}
@@ -3089,7 +3161,7 @@ export default function HomePage() {
                               generateInsights(food);
                             }}
                           >
-                            <div className="h-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 flex items-center justify-center">
+                            <div className="h-16 bg-gradient-to-r from-indigo-600/40 via-purple-600/40 to-indigo-600/40 flex items-center justify-center">
                               <span className="text-2xl">
                                 {getFoodEmoji(food.food_name)}
                               </span>
@@ -3107,8 +3179,7 @@ export default function HomePage() {
                                   {food.serving_type}
                                 </span>
                               </div>
-                            </div>
-                          </motion.div>
+                            </motion.div>
                         ))}
                     </div>
                   </div>
@@ -3167,7 +3238,7 @@ export default function HomePage() {
                       disabled={new Date(selectedDate).toDateString() === new Date().toDateString()}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4-4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
                     </button>
                   </div>
