@@ -82,33 +82,4 @@ async function handleUnsplashFallback(foodName, description, res) {
     return res.status(500).json({ message: 'Error generating image via fallback method' });
   }
 }
-        responseMimeType: "image/jpeg",
-      },
-    });
-
-    const response = await result.response;
-    const imageData = response.candidates[0].content.parts[0].inlineData.data;
-    
-    // The response will include the image as a base64-encoded string
-    res.status(200).json({ 
-      success: true,
-      imageData: `data:image/jpeg;base64,${imageData}`
-    });
-    
-  } catch (error) {
-    console.error('Error generating food image:', error);
-    
-    // Provide a helpful error message if it's an API key issue
-    if (error.message && error.message.includes('API key')) {
-      return res.status(401).json({
-        message: 'Invalid or missing Gemini API key. Make sure to set the GEMINI_API_KEY environment variable.',
-        error: error.message
-      });
-    }
-    
-    res.status(500).json({ 
-      message: 'Error generating food image', 
-      error: error.message 
-    });
-  }
 }
