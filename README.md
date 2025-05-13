@@ -2,7 +2,6 @@
 
 NutriSmart AI is your intelligent nutrition coach, designed to make healthy eating simple, personalized, and actionable. Leveraging the power of AI, this application helps you understand your dietary habits, discover new recipes, plan your fitness, and achieve your wellness goals.
 
-![NutriSmart AI Banner](./imagesanna/banner.png)
 
 ## 🚀 Overview
 
@@ -21,7 +20,6 @@ NutriSmart AI offers a comprehensive suite of tools to manage your nutritional j
 ### Dashboard
 Your nutrition hub showing personalized stats, AI insights, and quick access to all features including diary, recipes, and fitness planning.
 
-![Home Dashboard](./imagesanna/home.png)
 
 ### Food Diary
 Track meals with detailed nutrition data. View macro charts, filter by date, and receive AI insights on your eating patterns.
@@ -29,17 +27,14 @@ Track meals with detailed nutrition data. View macro charts, filter by date, and
 ### Recipe Page
 AI-powered recipe finder based on your preferences and goals. Get ingredients, instructions, and nutritional details with personalized recommendations.
 
-![Recipe Page](./imagesanna/recipie.png)
 
 ### Fitness Page
 Custom workout plans that complement your nutrition goals. Track exercises, monitor progress, and receive AI guidance on optimal meal timing.
 
-![Fitness Page](./imagesanna/fitness.png)
 
 ### Profile Page
 Your health command center displaying metrics, goals, and achievements. View progress charts and receive personalized AI insights.
 
-![Profile Page](./imagesanna/profile.png)
 
 ### Grocery List
 Smart shopping assistant with AI-recommended items based on your health profile. Organize by categories and export lists as PDFs.
